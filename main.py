@@ -144,7 +144,7 @@ def main() -> set[str]:
     load_dotenv()
     hh_url = 'https://api.hh.ru/vacancies'
     hh_params = {
-        'period': 1,
+        'period': 30,
         'specialization': 1,
         'area': 1,
         'professional_role': 96,
