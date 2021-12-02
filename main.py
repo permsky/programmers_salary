@@ -86,7 +86,7 @@ def predict_rub_salary_sj(vacancy: dict) -> Union[int, None]:
 
 
 def create_hh_table(languages: list[str], url: str, params: dict,
-                    headers: dict, table_header: list) -> AsciiTable:
+                    headers: dict, table_header: list) -> str:
     """
     Create table of vacancies and middle salary for programming 
     language for hh.ru.
@@ -113,7 +113,7 @@ def create_hh_table(languages: list[str], url: str, params: dict,
 
 
 def create_sj_table(languages: list[str], url: str, params: dict,
-                    headers: dict, table_header: list) -> AsciiTable:
+                    headers: dict, table_header: list) -> str:
     """
     Create table of vacancies and middle salary for programming 
     language for superjob.ru.
@@ -139,7 +139,7 @@ def create_sj_table(languages: list[str], url: str, params: dict,
     return table.table
 
 
-def main() -> None:
+def main() -> set[str]:
     """"""
     load_dotenv()
     hh_url = 'https://api.hh.ru/vacancies'
