@@ -116,13 +116,15 @@ def get_hh_statistics(languages: list[str], hh_header: str,
                 hh_area_id=hh_area_id,
                 hh_period=hh_period):
             if vacancy:
-                vacancies_processed += 1
                 salary = vacancy['salary']
-                salaries_sum += predict_rub_salary_hh(
+                average_rub_salary = predict_rub_salary_hh(
                     currency=salary['currency'],
                     salary_from=salary['from'],
                     salary_to=salary['to']
                 )
+                if average_rub_salary:
+                    vacancies_processed += 1
+                    salaries_sum += average_rub_salary
         hh_statistics.append(
             [
                 language,
@@ -153,12 +155,14 @@ def get_sj_statistics(languages: list[str], sj_catalogues_id: int,
                 sj_town_id=sj_town_id,
                 sj_period=sj_period):
             if vacancy:
-                vacancies_processed += 1
-                salaries_sum += predict_rub_salary_sj(
+                average_rub_salary = predict_rub_salary_sj(
                     currency=vacancy['currency'],
                     salary_from=vacancy['payment_from'],
                     salary_to=vacancy['payment_to']
                 )
+                if average_rub_salary:
+                    vacancies_processed += 1
+                    salaries_sum += average_rub_salary
         sj_statistics.append(
             [
                 language,
