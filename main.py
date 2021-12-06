@@ -139,8 +139,8 @@ def create_sj_table(languages: list[str], url: str, params: dict,
     return table.table
 
 
-def main() -> set[str]:
-    """"""
+def main() -> None:
+    """Print average salary tables for hh.ru and superjob.ru."""
     load_dotenv()
     hh_url = 'https://api.hh.ru/vacancies'
     hh_params = {
@@ -178,11 +178,12 @@ def main() -> set[str]:
         'C', 'Ruby', 'Go'
     ]
 
-    return (create_hh_table(programming_languages, hh_url, hh_params,
-                            hh_headers, table_header), 
-            create_sj_table(programming_languages, sj_url, sj_params, 
-                            sj_headers, table_header))
+    tables = (create_hh_table(programming_languages, hh_url, hh_params,
+                              hh_headers, table_header),
+              create_sj_table(programming_languages, sj_url, sj_params,
+                              sj_headers, table_header))
+    print(*tables, sep='\n')
 
 
 if __name__ == '__main__':
-    print(*main(), sep='\n')
+    main()
