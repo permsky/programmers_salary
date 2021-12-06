@@ -108,14 +108,14 @@ def get_hh_statistics(languages: list[str], hh_header: str,
         vacancies_processed = 0
         salaries_sum = 0
         for vacancy, vacancy_count in fetch_hh_vacancies(
-            hh_header=hh_header,
-            hh_professional_role_id=hh_professional_role_id,
-            hh_specialization_id=hh_specialization_id,
-            language=language,
-            hh_per_page=hh_per_page,
-            hh_area_id=hh_area_id,
-            hh_period=hh_period):
-            if vacancy is not None:
+                hh_header=hh_header,
+                hh_professional_role_id=hh_professional_role_id,
+                hh_specialization_id=hh_specialization_id,
+                language=language,
+                hh_per_page=hh_per_page,
+                hh_area_id=hh_area_id,
+                hh_period=hh_period):
+            if vacancy:
                 vacancies_processed += 1
                 salary = vacancy['salary']
                 salaries_sum += predict_rub_salary_hh(
@@ -152,7 +152,7 @@ def get_sj_statistics(languages: list[str], sj_catalogues_id: int,
                 vacancy_count_per_page=vacancy_count_per_page,
                 sj_town_id=sj_town_id,
                 sj_period=sj_period):
-            if vacancy is not None:
+            if vacancy:
                 vacancies_processed += 1
                 salaries_sum += predict_rub_salary_sj(
                     currency=vacancy['currency'],
