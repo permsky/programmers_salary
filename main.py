@@ -8,8 +8,9 @@ from terminaltables import AsciiTable
 
 
 def fetch_hh_vacancies(hh_header: str, hh_professional_role_id: int,
-        hh_specialization_id: int, language: str, vacancy_count_per_page: int,
-        hh_area_id: int, hh_period: int) -> Generator[tuple, None, None]:
+        hh_specialization_id: int, language: str,
+        vacancy_count_per_page: int, hh_area_id: int,
+        hh_period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from hh.ru"""
     for page in count():
         page_response = requests.get(
@@ -33,14 +34,13 @@ def fetch_hh_vacancies(hh_header: str, hh_professional_role_id: int,
         if page >= page_data['pages'] or page == 199:
             break
         
-        vacancy_count = page_data['found']
         for vacancy in page_data['items']:
-            yield vacancy, vacancy_count
+            yield vacancy, page_data['found']
 
 
 def fetch_sj_vacancies(language: str, sj_catalogues_id: int,
         sj_key: str, vacancy_count_per_page: int, sj_town_id: int,
-        sj_period: int) -> Generator[dict, None, None]:
+        sj_period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from superjob.ru"""
     for page in count():
         page_response = requests.get(
