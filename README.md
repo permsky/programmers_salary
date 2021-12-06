@@ -16,14 +16,20 @@
   - создайте виртуальное окружение [virtualenv/venv](https://docs.python.org/3/library/venv.html) для изоляции проекта и активируйте его.
   - установите необходимые зависимости:
 
-    ```pip install -r requirements.txt```
+    ```
+    pip install -r requirements.txt
+    ```
   - получите секретный ключ для работы с API сайта [superjob.ru](https://api.superjob.ru/) и сохраните его в переменной окружения
   в файле ```.env``` в директории скрипта:
 
-    ```SJ_KEY=v3.r.123456789.abcdef1234g5hi012345678910123c104d1a52e003.c7dbe23ad10f3eb1234a3b88a372f7fed7e7f48```
+    ```
+    SJ_KEY=v3.r.123456789.abcdef1234g5hi012345678910123c104d1a52e003.c7dbe23ad10f3eb1234a3b88a372f7fed7e7f48
+    ```
   - запустите скрипт командой:
 
-    ```python main.py```
+    ```
+    python main.py
+    ```
 
 ## Цели проекта
 Код написан в учебных целях — это урок в курсе по Python и веб-разработке на сайте [Devman](https://dvmn.org).
