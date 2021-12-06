@@ -56,20 +56,17 @@ def predict_salary(salary_from: Union[None, int],
     """Return vacancy's approx salary."""
     if salary_from and salary_to:
         return int((salary_from + salary_to) / 2)
-    else:
-        if salary_from:
-            return int(salary_from * 1.2)
-        if salary_to:
-            return int(salary_to * 0.8)
+    elif salary_from:
+        return int(salary_from * 1.2)
+    elif salary_to:
+        return int(salary_to * 0.8)
     return None
 
 
 def predict_rub_salary_hh(vacancy: dict) -> Union[None, int]:
     """Return vacancy's approx salary in rubles for hh.ru."""
     salary = vacancy['salary']
-    if salary is None:
-        return None
-    if salary['currency'] == 'RUR':
+    if salary is not None and salary['currency'] == 'RUR':
         salary_from = salary['from']
         salary_to = salary['to']
         return predict_salary(salary_from, salary_to)
