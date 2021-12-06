@@ -85,13 +85,13 @@ def predict_rub_salary_sj(vacancy: dict) -> Union[int, None]:
     return None
 
 
-def create_hh_table(languages: list[str], url: str, params: dict,
-                    headers: dict, table_header: list) -> str:
+def get_hh_statistics(languages: list[str], url: str, params: dict,
+                    headers: dict) -> str:
     """
-    Create table of vacancies and middle salary for programming 
+    Get statictics of vacancies and average salary for programming 
     language for hh.ru.
     """
-    table_data = table_header.copy()
+    hh_statistics = []
     for language in languages:
         params['text'] = language
         vacancies_processed = 0
@@ -100,7 +100,7 @@ def create_hh_table(languages: list[str], url: str, params: dict,
             if predict_rub_salary_hh(vacancy) is not None:
                 vacancies_processed += 1
                 salaries_sum += predict_rub_salary_hh(vacancy)
-        table_data.append(
+        hh_statistics.append(
             [
                 language,
                 get_hh_vacancies_count(url, params, headers),
@@ -108,17 +108,16 @@ def create_hh_table(languages: list[str], url: str, params: dict,
                 int(salaries_sum / vacancies_processed)
             ]
         )
-    table = AsciiTable(table_data, 'HeadHunter Moscow')
-    return table.table
+    return hh_statistics
 
 
-def create_sj_table(languages: list[str], url: str, params: dict,
-                    headers: dict, table_header: list) -> str:
+def get_sj_statistics(languages: list[str], url: str, params: dict,
+                    headers: dict) -> str:
     """
-    Create table of vacancies and middle salary for programming 
+    Get statictics of vacancies and average salary for programming 
     language for superjob.ru.
     """
-    table_data = table_header.copy()
+    sj_statistics = []
     for language in languages:
         params['keyword'] = language
         vacancies_processed = 0
@@ -127,7 +126,7 @@ def create_sj_table(languages: list[str], url: str, params: dict,
             if predict_rub_salary_sj(vacancy) is not None:
                 vacancies_processed += 1
                 salaries_sum += predict_rub_salary_sj(vacancy)
-        table_data.append(
+        sj_statistics.append(
             [
                 language,
                 get_sj_vacancies_count(url, params, headers),
@@ -135,7 +134,22 @@ def create_sj_table(languages: list[str], url: str, params: dict,
                 int(salaries_sum / vacancies_processed)
             ]
         )
-    table = AsciiTable(table_data, 'SuperJob Moscow')
+    return sj_statistics
+
+
+def create_table(table_name: str, table_data: list) -> str:
+    """Create terminal table."""
+    table_header = [
+            [
+                'Язык программирования',
+                'Вакансий найдено',
+                'Вакансий обработано',
+                'Средняя зарплата'
+            ]
+    ]
+    for language_statistics in table_data:
+        table_header.append(language_statistics)
+    table = AsciiTable(table_header, table_name)
     return table.table
 
 
@@ -151,6 +165,7 @@ def main() -> None:
         'per_page': 10,
     }
     hh_headers = {'User-Agent': 'GetSalaries (rainbowf@mail.ru)'}
+    hh_table_name = 'HeadHunter Moscow'
     
     sj_url = 'https://api.superjob.ru/2.0/vacancies/'
     sj_key = os.getenv('SJ_KEY')
@@ -163,26 +178,21 @@ def main() -> None:
     sj_headers = {
         'X-Api-App-Id': sj_key,
     }
-
-    table_header = [
-            [
-                'Язык программирования',
-                'Вакансий найдено',
-                'Вакансий обработано',
-                'Средняя зарплата'
-            ]
-    ]
+    sj_table_name = 'SuperJob Moscow'
 
     programming_languages = [
         'JavaScript', 'Python', 'Java', 'C#', 'PHP', 'C++',
         'C', 'Ruby', 'Go'
     ]
 
-    tables = (create_hh_table(programming_languages, hh_url, hh_params,
-                              hh_headers, table_header),
-              create_sj_table(programming_languages, sj_url, sj_params,
-                              sj_headers, table_header))
-    print(*tables, sep='\n')
+    hh_statistics = get_hh_statistics(programming_languages, hh_url,
+                                      hh_params, hh_headers)
+    sj_statistics = get_sj_statistics(programming_languages, sj_url,
+                                      sj_params, sj_headers)
+
+    terminal_tables = (create_table(hh_table_name, hh_statistics),
+                       create_table(sj_table_name, sj_statistics))
+    print(*terminal_tables, sep='\n')
 
 
 if __name__ == '__main__':
