@@ -98,7 +98,7 @@ def predict_rub_salary_sj(currency: str, salary_from: int,
 
 def get_hh_statistics(languages: list[str], hh_header: str,
         hh_professional_role_id: int, hh_specialization_id: int,
-        hh_period: int, hh_per_page: int, hh_area_id: int) -> str:
+        hh_period: int, vacancy_count_per_page: int, hh_area_id: int) -> str:
     """
     Get statictics of vacancies and average salary for programming 
     language for hh.ru.
@@ -112,19 +112,20 @@ def get_hh_statistics(languages: list[str], hh_header: str,
                 hh_professional_role_id=hh_professional_role_id,
                 hh_specialization_id=hh_specialization_id,
                 language=language,
-                hh_per_page=hh_per_page,
+                vacancy_count_per_page=vacancy_count_per_page,
                 hh_area_id=hh_area_id,
                 hh_period=hh_period):
             if vacancy:
                 salary = vacancy['salary']
-                average_rub_salary = predict_rub_salary_hh(
-                    currency=salary['currency'],
-                    salary_from=salary['from'],
-                    salary_to=salary['to']
-                )
-                if average_rub_salary:
-                    vacancies_processed += 1
-                    salaries_sum += average_rub_salary
+                if salary:
+                    average_rub_salary = predict_rub_salary_hh(
+                        currency=salary['currency'],
+                        salary_from=salary['from'],
+                        salary_to=salary['to']
+                    )
+                    if average_rub_salary:
+                        vacancies_processed += 1
+                        salaries_sum += average_rub_salary
         hh_statistics.append(
             [
                 language,
@@ -212,7 +213,7 @@ def main() -> None:
         hh_professional_role_id=96,
         hh_specialization_id=1,
         hh_period=30,
-        vacancy_count_per_page=10,
+        vacancy_count_per_page=vacancy_count_per_page,
         hh_area_id=1
     )
     sj_statistics = get_sj_statistics(
