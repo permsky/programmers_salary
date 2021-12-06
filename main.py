@@ -66,9 +66,7 @@ def predict_salary(salary_from: Union[None, int],
 def predict_rub_salary_hh(vacancy: dict) -> Union[None, int]:
     """Return vacancy's approx salary in rubles for hh.ru."""
     salary = vacancy['salary']
-    if salary is None:
-        return None
-    if salary['currency'] == 'RUR':
+    if salary is not None and salary['currency'] == 'RUR':
         salary_from = salary['from']
         salary_to = salary['to']
         return predict_salary(salary_from, salary_to)
