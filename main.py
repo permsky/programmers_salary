@@ -131,7 +131,8 @@ def get_hh_statistics(languages: list[str], hh_header: str,
                 language,
                 vacancy_count,
                 vacancies_processed,
-                int(salaries_sum / vacancies_processed)
+                int(salaries_sum / vacancies_processed if
+                    vacancies_processed > 0 else 0)
             ]
         )
     return hh_statistics
@@ -169,7 +170,8 @@ def get_sj_statistics(languages: list[str], sj_catalogues_id: int,
                 language,
                 vacancy_count,
                 vacancies_processed,
-                int(salaries_sum / vacancies_processed)
+                int(salaries_sum / vacancies_processed if
+                    vacancies_processed > 0 else 0)
             ]
         )
     return sj_statistics
