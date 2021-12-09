@@ -7,9 +7,13 @@ from dotenv import load_dotenv
 from terminaltables import AsciiTable
 
 
-def fetch_hh_vacancies(hh_header: str, hh_professional_role_id: int,
-        hh_specialization_id: int, language: str,
-        vacancy_count_per_page: int, hh_area_id: int,
+def fetch_hh_vacancies(
+        hh_header: str,
+        hh_professional_role_id: int,
+        hh_specialization_id: int,
+        language: str,
+        vacancy_count_per_page: int,
+        hh_area_id: int,
         hh_period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from hh.ru"""
     for page in count():
@@ -33,13 +37,16 @@ def fetch_hh_vacancies(hh_header: str, hh_professional_role_id: int,
 
         if page >= page_data['pages'] or page == 199:
             break
-        
         for vacancy in page_data['items']:
             yield vacancy, page_data['found']
 
 
-def fetch_sj_vacancies(language: str, sj_catalogues_id: int,
-        sj_key: str, vacancy_count_per_page: int, sj_town_id: int,
+def fetch_sj_vacancies(
+        language: str,
+        sj_catalogues_id: int,
+        sj_key: str,
+        vacancy_count_per_page: int,
+        sj_town_id: int,
         sj_period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from superjob.ru"""
     for page in count():
@@ -68,7 +75,8 @@ def fetch_sj_vacancies(language: str, sj_catalogues_id: int,
             yield vacancy, vacancy_count
 
 
-def predict_salary(salary_from: Union[None, int],
+def predict_salary(
+        salary_from: Union[None, int],
         salary_to: Union[None, int]) -> Union[None, int]:
     """Return vacancy's approx salary."""
     if salary_from and salary_to:
@@ -80,7 +88,9 @@ def predict_salary(salary_from: Union[None, int],
     return None
 
 
-def predict_rub_salary_hh(currency: str, salary_from: int,
+def predict_rub_salary_hh(
+        currency: str,
+        salary_from: int,
         salary_to: int) -> Union[None, int]:
     """Return vacancy's approx salary in rubles for hh.ru."""
     if currency == 'RUR':
@@ -88,7 +98,9 @@ def predict_rub_salary_hh(currency: str, salary_from: int,
     return None
 
 
-def predict_rub_salary_sj(currency: str, salary_from: int,
+def predict_rub_salary_sj(
+        currency: str,
+        salary_from: int,
         salary_to: int) -> Union[int, None]:
     """Return vacancy's approx salary in rubles for superjob.ru."""
     if currency == 'rub':
@@ -96,11 +108,16 @@ def predict_rub_salary_sj(currency: str, salary_from: int,
     return None
 
 
-def get_hh_statistics(languages: list[str], hh_header: str,
-        hh_professional_role_id: int, hh_specialization_id: int,
-        hh_period: int, vacancy_count_per_page: int, hh_area_id: int) -> str:
+def get_hh_statistics(
+        languages: list[str],
+        hh_header: str,
+        hh_professional_role_id: int,
+        hh_specialization_id: int,
+        hh_period: int,
+        vacancy_count_per_page: int,
+        hh_area_id: int) -> str:
     """
-    Get statictics of vacancies and average salary for programming 
+    Get statictics of vacancies and average salary for programming
     language for hh.ru.
     """
     hh_statistics = []
@@ -138,11 +155,15 @@ def get_hh_statistics(languages: list[str], hh_header: str,
     return hh_statistics
 
 
-def get_sj_statistics(languages: list[str], sj_catalogues_id: int,
-        sj_key: str, vacancy_count_per_page: int, sj_town_id: int,
+def get_sj_statistics(
+        languages: list[str],
+        sj_catalogues_id: int,
+        sj_key: str,
+        vacancy_count_per_page: int,
+        sj_town_id: int,
         sj_period: int) -> str:
     """
-    Get statictics of vacancies and average salary for programming 
+    Get statictics of vacancies and average salary for programming
     language for superjob.ru.
     """
     sj_statistics = []
