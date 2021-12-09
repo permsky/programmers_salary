@@ -88,23 +88,19 @@ def predict_salary(
     return None
 
 
-def predict_rub_salary_hh(
-        currency: str,
-        salary_from: int,
-        salary_to: int) -> Union[None, int]:
+def predict_rub_salary_hh(vacancy: dict) -> Union[None, int]:
     """Return vacancy's approx salary in rubles for hh.ru."""
-    if currency == 'RUR':
-        return predict_salary(salary_from, salary_to)
+    salary = vacancy['salary']
+    if salary:
+        if salary['currency'] == 'RUR':
+            return predict_salary(salary['from'], salary['to'])
     return None
 
 
-def predict_rub_salary_sj(
-        currency: str,
-        salary_from: int,
-        salary_to: int) -> Union[int, None]:
+def predict_rub_salary_sj(vacancy: dict) -> Union[int, None]:
     """Return vacancy's approx salary in rubles for superjob.ru."""
-    if currency == 'rub':
-        return predict_salary(salary_from, salary_to)
+    if vacancy['currency'] == 'rub':
+        return predict_salary(vacancy['payment_from'], vacancy['payment_to'])
     return None
 
 
@@ -133,16 +129,10 @@ def get_hh_statistics(
                 area_id=area_id,
                 period=period):
             if vacancy:
-                salary = vacancy['salary']
-                if salary:
-                    average_rub_salary = predict_rub_salary_hh(
-                        currency=salary['currency'],
-                        salary_from=salary['from'],
-                        salary_to=salary['to']
-                    )
-                    if average_rub_salary:
-                        vacancies_processed += 1
-                        salaries_sum += average_rub_salary
+                average_rub_salary = predict_rub_salary_hh(vacancy)
+                if average_rub_salary:
+                    vacancies_processed += 1
+                    salaries_sum += average_rub_salary
         language_statistics.append(
             [
                 language,
@@ -178,11 +168,7 @@ def get_sj_statistics(
                 town_id=town_id,
                 period=period):
             if vacancy:
-                average_rub_salary = predict_rub_salary_sj(
-                    currency=vacancy['currency'],
-                    salary_from=vacancy['payment_from'],
-                    salary_to=vacancy['payment_to']
-                )
+                average_rub_salary = predict_rub_salary_sj(vacancy)
                 if average_rub_salary:
                     vacancies_processed += 1
                     salaries_sum += average_rub_salary
