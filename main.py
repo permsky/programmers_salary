@@ -8,71 +8,71 @@ from terminaltables import AsciiTable
 
 
 def fetch_hh_vacancies(
-        hh_header: str,
-        hh_professional_role_id: int,
-        hh_specialization_id: int,
+        header: str,
+        professional_role_id: int,
+        specialization_id: int,
         language: str,
         vacancy_count_per_page: int,
-        hh_area_id: int,
-        hh_period: int) -> Generator[tuple[dict, int], None, None]:
+        area_id: int,
+        period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from hh.ru"""
+    page_content = {'pages': 0}
     for page in count():
+        if page > page_content['pages'] or page == 200:
+            break
         page_response = requests.get(
             url='https://api.hh.ru/vacancies',
             headers={
-                'User-Agent': hh_header,
+                'User-Agent': header,
             },
             params={
-                'period': hh_period,
-                'specialization': hh_specialization_id,
-                'area': hh_area_id,
-                'professional_role': hh_professional_role_id,
+                'period': period,
+                'specialization': specialization_id,
+                'area': area_id,
+                'professional_role': professional_role_id,
                 'per_page': vacancy_count_per_page,
                 'page': page,
                 'text': language,
             }
         )
         page_response.raise_for_status()
-        page_data = page_response.json()
+        page_content = page_response.json()
 
-        if page >= page_data['pages'] or page == 199:
-            break
-        for vacancy in page_data['items']:
-            yield vacancy, page_data['found']
+        for vacancy in page_content['items']:
+            yield vacancy, page_content['found']
 
 
 def fetch_sj_vacancies(
         language: str,
-        sj_catalogues_id: int,
-        sj_key: str,
+        catalogues_id: int,
+        token: str,
         vacancy_count_per_page: int,
-        sj_town_id: int,
-        sj_period: int) -> Generator[tuple[dict, int], None, None]:
+        town_id: int,
+        period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from superjob.ru"""
+    page_content = {'more': 'True'}
     for page in count():
+        if not page_content['more'] or page == 50:
+            break
         page_response = requests.get(
             url='https://api.superjob.ru/2.0/vacancies/',
             headers={
-                'X-Api-App-Id': sj_key,
+                'X-Api-App-Id': token,
             },
             params={
-                'town': sj_town_id,
-                'catalogues': sj_catalogues_id,
+                'town': town_id,
+                'catalogues': catalogues_id,
                 'count': vacancy_count_per_page,
-                'period': sj_period,
+                'period': period,
                 'page': page,
                 'keyword': language,
             }
         )
         page_response.raise_for_status()
-        page_data = page_response.json()
+        page_content = page_response.json()
 
-        vacancy_count = page_data['total']
-        if page >= vacancy_count / vacancy_count_per_page or page == 49:
-            break
-
-        for vacancy in page_data['objects']:
-            yield vacancy, vacancy_count
+        for vacancy in page_content['objects']:
+            yield vacancy, page_content['total']
 
 
 def predict_salary(
@@ -110,28 +110,28 @@ def predict_rub_salary_sj(
 
 def get_hh_statistics(
         languages: list[str],
-        hh_header: str,
-        hh_professional_role_id: int,
-        hh_specialization_id: int,
-        hh_period: int,
+        header: str,
+        professional_role_id: int,
+        specialization_id: int,
+        period: int,
         vacancy_count_per_page: int,
-        hh_area_id: int) -> str:
+        area_id: int) -> str:
     """
     Get statictics of vacancies and average salary for programming
     language for hh.ru.
     """
-    hh_statistics = []
+    language_statistics = []
     for language in languages:
         vacancies_processed = 0
         salaries_sum = 0
         for vacancy, vacancy_count in fetch_hh_vacancies(
-                hh_header=hh_header,
-                hh_professional_role_id=hh_professional_role_id,
-                hh_specialization_id=hh_specialization_id,
+                header=header,
+                professional_role_id=professional_role_id,
+                specialization_id=specialization_id,
                 language=language,
                 vacancy_count_per_page=vacancy_count_per_page,
-                hh_area_id=hh_area_id,
-                hh_period=hh_period):
+                area_id=area_id,
+                period=period):
             if vacancy:
                 salary = vacancy['salary']
                 if salary:
@@ -143,7 +143,7 @@ def get_hh_statistics(
                     if average_rub_salary:
                         vacancies_processed += 1
                         salaries_sum += average_rub_salary
-        hh_statistics.append(
+        language_statistics.append(
             [
                 language,
                 vacancy_count,
@@ -152,31 +152,31 @@ def get_hh_statistics(
                     vacancies_processed > 0 else 0)
             ]
         )
-    return hh_statistics
+    return language_statistics
 
 
 def get_sj_statistics(
         languages: list[str],
-        sj_catalogues_id: int,
-        sj_key: str,
+        catalogues_id: int,
+        token: str,
         vacancy_count_per_page: int,
-        sj_town_id: int,
-        sj_period: int) -> str:
+        town_id: int,
+        period: int) -> str:
     """
     Get statictics of vacancies and average salary for programming
     language for superjob.ru.
     """
-    sj_statistics = []
+    language_statistics = []
     for language in languages:
         vacancies_processed = 0
         salaries_sum = 0
         for vacancy, vacancy_count in fetch_sj_vacancies(
                 language=language,
-                sj_catalogues_id=sj_catalogues_id,
-                sj_key=sj_key,
+                catalogues_id=catalogues_id,
+                token=token,
                 vacancy_count_per_page=vacancy_count_per_page,
-                sj_town_id=sj_town_id,
-                sj_period=sj_period):
+                town_id=town_id,
+                period=period):
             if vacancy:
                 average_rub_salary = predict_rub_salary_sj(
                     currency=vacancy['currency'],
@@ -186,7 +186,7 @@ def get_sj_statistics(
                 if average_rub_salary:
                     vacancies_processed += 1
                     salaries_sum += average_rub_salary
-        sj_statistics.append(
+        language_statistics.append(
             [
                 language,
                 vacancy_count,
@@ -195,10 +195,10 @@ def get_sj_statistics(
                     vacancies_processed > 0 else 0)
             ]
         )
-    return sj_statistics
+    return language_statistics
 
 
-def create_table(table_name: str, table_data: list) -> str:
+def create_table(table_name: str, table_content: list) -> str:
     """Create terminal table."""
     table_header = [
             [
@@ -208,8 +208,7 @@ def create_table(table_name: str, table_data: list) -> str:
                 'Средняя зарплата'
             ]
     ]
-    for language_statistics in table_data:
-        table_header.append(language_statistics)
+    table_header.extend(table_content)
     table = AsciiTable(table_header, table_name)
     return table.table
 
@@ -217,10 +216,10 @@ def create_table(table_name: str, table_data: list) -> str:
 def main() -> None:
     """Print average salary tables for hh.ru and superjob.ru."""
     load_dotenv()
-    hh_header = os.getenv('HH_HEADER')
+    header = os.getenv('HH_HEADER')
     hh_table_name = 'HeadHunter Moscow'
 
-    sj_key = os.getenv('SJ_KEY')
+    token = os.getenv('SJ_TOKEN')
     sj_table_name = 'SuperJob Moscow'
 
     vacancy_count_per_page = 10
@@ -232,20 +231,20 @@ def main() -> None:
 
     hh_statistics = get_hh_statistics(
         languages=programming_languages,
-        hh_header=hh_header,
-        hh_professional_role_id=96,
-        hh_specialization_id=1,
-        hh_period=30,
+        header=header,
+        professional_role_id=96,
+        specialization_id=1,
+        period=30,
         vacancy_count_per_page=vacancy_count_per_page,
-        hh_area_id=1
+        area_id=1
     )
     sj_statistics = get_sj_statistics(
         languages=programming_languages,
-        sj_catalogues_id=48,
-        sj_key=sj_key,
+        catalogues_id=48,
+        token=token,
         vacancy_count_per_page=vacancy_count_per_page,
-        sj_town_id=4,
-        sj_period=7
+        town_id=4,
+        period=7
     )
 
     terminal_tables = (create_table(hh_table_name, hh_statistics),
