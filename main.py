@@ -91,9 +91,8 @@ def predict_salary(
 def predict_rub_salary_hh(vacancy: dict) -> Union[None, int]:
     """Return vacancy's approx salary in rubles for hh.ru."""
     salary = vacancy['salary']
-    if salary:
-        if salary['currency'] == 'RUR':
-            return predict_salary(salary['from'], salary['to'])
+    if salary and salary['currency'] == 'RUR':
+        return predict_salary(salary['from'], salary['to'])
     return None
 
 
