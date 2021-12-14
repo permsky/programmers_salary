@@ -16,30 +16,34 @@ def fetch_hh_vacancies(
         area_id: int,
         period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from hh.ru"""
-    page_content = {'pages': 0}
-    for page in count():
-        if page > page_content['pages'] or page == 200:
-            break
-        page_response = requests.get(
-            url='https://api.hh.ru/vacancies',
-            headers={
-                'User-Agent': header,
-            },
-            params={
-                'period': period,
-                'specialization': specialization_id,
-                'area': area_id,
-                'professional_role': professional_role_id,
-                'per_page': vacancy_count_per_page,
-                'page': page,
-                'text': language,
-            }
-        )
-        page_response.raise_for_status()
-        page_content = page_response.json()
+    with requests.Session() as s:
+        for page in count():
+            try:
+                page_response = s.get(
+                    url='https://api.hh.ru/vacancies',
+                    headers={
+                        'User-Agent': header,
+                    },
+                    params={
+                        'period': period,
+                        'specialization': specialization_id,
+                        'area': area_id,
+                        'professional_role': professional_role_id,
+                        'per_page': vacancy_count_per_page,
+                        'page': page,
+                        'text': language,
+                    }
+                )
+                page_response.raise_for_status()
+                page_content = page_response.json()
 
-        for vacancy in page_content['items']:
-            yield vacancy, page_content['found']
+                for vacancy in page_content['items']:
+                    yield vacancy, page_content['found']
+
+                if page > page_content['pages']:
+                    break
+            except requests.exceptions.HTTPError:
+                break
 
 
 def fetch_sj_vacancies(
@@ -50,29 +54,33 @@ def fetch_sj_vacancies(
         town_id: int,
         period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from superjob.ru"""
-    page_content = {'more': 'True'}
-    for page in count():
-        if not page_content['more'] or page == 50:
-            break
-        page_response = requests.get(
-            url='https://api.superjob.ru/2.0/vacancies/',
-            headers={
-                'X-Api-App-Id': token,
-            },
-            params={
-                'town': town_id,
-                'catalogues': catalogues_id,
-                'count': vacancy_count_per_page,
-                'period': period,
-                'page': page,
-                'keyword': language,
-            }
-        )
-        page_response.raise_for_status()
-        page_content = page_response.json()
+    with requests.Session() as s:
+        for page in count():
+            try:
+                page_response = s.get(
+                    url='https://api.superjob.ru/2.0/vacancies',
+                    headers={
+                        'X-Api-App-Id': token,
+                    },
+                    params={
+                        'town': town_id,
+                        'catalogues': catalogues_id,
+                        'count': vacancy_count_per_page,
+                        'period': period,
+                        'page': page,
+                        'keyword': language,
+                    }
+                )
+                page_response.raise_for_status()
+                page_content = page_response.json()
 
-        for vacancy in page_content['objects']:
-            yield vacancy, page_content['total']
+                for vacancy in page_content['objects']:
+                    yield vacancy, page_content['total']
+
+                if not page_content['more']:
+                    break
+            except requests.exceptions.HTTPError:
+                break
 
 
 def predict_salary(
