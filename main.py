@@ -136,17 +136,17 @@ def get_hh_statistics(
                 area_id=area_id,
                 period=period):
             if vacancy:
-                average_rub_salary = predict_rub_salary_hh(vacancy)
-                if average_rub_salary:
+                approximate_rub_salary = predict_rub_salary_hh(vacancy)
+                if approximate_rub_salary:
                     vacancies_processed += 1
-                    salaries_sum += average_rub_salary
+                    salaries_sum += approximate_rub_salary
+        average_rub_salary = salaries_sum / vacancies_processed
         language_statistics.append(
             [
                 language,
                 vacancy_count,
                 vacancies_processed,
-                int(salaries_sum / vacancies_processed if
-                    vacancies_processed > 0 else 0)
+                int(average_rub_salary if vacancies_processed else 0)
             ]
         )
     return language_statistics
@@ -175,17 +175,17 @@ def get_sj_statistics(
                 town_id=town_id,
                 period=period):
             if vacancy:
-                average_rub_salary = predict_rub_salary_sj(vacancy)
-                if average_rub_salary:
+                approximate_rub_salary = predict_rub_salary_sj(vacancy)
+                if approximate_rub_salary:
                     vacancies_processed += 1
-                    salaries_sum += average_rub_salary
+                    salaries_sum += approximate_rub_salary
+        average_rub_salary = salaries_sum / vacancies_processed
         language_statistics.append(
             [
                 language,
                 vacancy_count,
                 vacancies_processed,
-                int(salaries_sum / vacancies_processed if
-                    vacancies_processed > 0 else 0)
+                int(average_rub_salary if vacancies_processed else 0)
             ]
         )
     return language_statistics
