@@ -40,7 +40,7 @@ def fetch_hh_vacancies(
                 for vacancy in page_content['items']:
                     yield vacancy, page_content['found']
 
-                if page > page_content['pages']:
+                if page >= page_content['pages'] - 1:
                     break
             except requests.exceptions.HTTPError:
                 break
