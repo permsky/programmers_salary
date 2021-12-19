@@ -17,22 +17,20 @@ def fetch_hh_vacancies(
         period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from hh.ru"""
     with requests.Session() as s:
-        for page in count():
-            try:
-                page_response = s.get(
-                    url='https://api.hh.ru/vacancies',
-                    headers={
-                        'User-Agent': header,
-                    },
-                    params={
+        s.headers.update({'User-Agent': header})
+        s.params = {
                         'period': period,
                         'specialization': specialization_id,
                         'area': area_id,
                         'professional_role': professional_role_id,
                         'per_page': vacancy_count_per_page,
-                        'page': page,
                         'text': language,
                     }
+        for page in count():
+            try:
+                page_response = s.get(
+                    url='https://api.hh.ru/vacancies',
+                    params={'page': page}
                 )
                 page_response.raise_for_status()
                 page_content = page_response.json()
@@ -55,21 +53,19 @@ def fetch_sj_vacancies(
         period: int) -> Generator[tuple[dict, int], None, None]:
     """Create generator of vacancies from superjob.ru"""
     with requests.Session() as s:
-        for page in count():
-            try:
-                page_response = s.get(
-                    url='https://api.superjob.ru/2.0/vacancies',
-                    headers={
-                        'X-Api-App-Id': token,
-                    },
-                    params={
+        s.headers.update({'X-Api-App-Id': token})
+        s.params = {
                         'town': town_id,
                         'catalogues': catalogues_id,
                         'count': vacancy_count_per_page,
                         'period': period,
-                        'page': page,
                         'keyword': language,
                     }
+        for page in count():
+            try:
+                page_response = s.get(
+                    url='https://api.superjob.ru/2.0/vacancies',
+                    params={'page': page}
                 )
                 page_response.raise_for_status()
                 page_content = page_response.json()
