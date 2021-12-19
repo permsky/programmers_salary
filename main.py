@@ -194,12 +194,12 @@ def get_sj_statistics(
 def create_table(table_name: str, table_content: list) -> str:
     """Create terminal table."""
     table_header = [
-            [
-                'Язык программирования',
-                'Вакансий найдено',
-                'Вакансий обработано',
-                'Средняя зарплата'
-            ]
+        [
+            'Язык программирования',
+            'Вакансий найдено',
+            'Вакансий обработано',
+            'Средняя зарплата'
+        ]
     ]
     table_header.extend(table_content)
     table = AsciiTable(table_header, table_name)
