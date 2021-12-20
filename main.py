@@ -27,20 +27,17 @@ def fetch_hh_vacancies(
                         'text': language,
                     }
         for page in count():
-            try:
-                page_response = s.get(
-                    url='https://api.hh.ru/vacancies',
-                    params={'page': page}
-                )
-                page_response.raise_for_status()
-                page_content = page_response.json()
+            page_response = s.get(
+                url='https://api.hh.ru/vacancies',
+                params={'page': page}
+            )
+            page_response.raise_for_status()
+            page_content = page_response.json()
 
-                for vacancy in page_content['items']:
-                    yield vacancy, page_content['found']
+            for vacancy in page_content['items']:
+                yield vacancy, page_content['found']
 
-                if page >= page_content['pages'] - 1:
-                    break
-            except requests.exceptions.HTTPError:
+            if page >= page_content['pages'] - 1:
                 break
 
 
@@ -62,20 +59,17 @@ def fetch_sj_vacancies(
                         'keyword': language,
                     }
         for page in count():
-            try:
-                page_response = s.get(
-                    url='https://api.superjob.ru/2.0/vacancies',
-                    params={'page': page}
-                )
-                page_response.raise_for_status()
-                page_content = page_response.json()
+            page_response = s.get(
+                url='https://api.superjob.ru/2.0/vacancies',
+                params={'page': page}
+            )
+            page_response.raise_for_status()
+            page_content = page_response.json()
 
-                for vacancy in page_content['objects']:
-                    yield vacancy, page_content['total']
+            for vacancy in page_content['objects']:
+                yield vacancy, page_content['total']
 
-                if not page_content['more']:
-                    break
-            except requests.exceptions.HTTPError:
+            if not page_content['more']:
                 break
 
 
