@@ -1,10 +1,19 @@
 import os
+import sys
 from itertools import count
 from typing import Union, Generator
 
 import requests
 from dotenv import load_dotenv
+from loguru import logger
 from terminaltables import AsciiTable
+
+
+logger.add(
+    sys.stderr,
+    format='[{time:HH:mm:ss}] <lvl>{message}</lvl>',
+    level='ERROR'
+)
 
 
 def fetch_hh_vacancies(
@@ -196,43 +205,52 @@ def create_table(table_name: str, table_content: list) -> str:
     return table.table
 
 
+@logger.catch
 def main() -> None:
     """Print average salary tables for hh.ru and superjob.ru."""
-    load_dotenv()
-    header = os.getenv('HH_HEADER')
-    hh_table_name = 'HeadHunter Moscow'
+    try:
+        load_dotenv()
+        header = os.getenv('HH_HEADER')
+        hh_table_name = 'HeadHunter Moscow'
 
-    token = os.getenv('SJ_TOKEN')
-    sj_table_name = 'SuperJob Moscow'
+        token = os.getenv('SJ_TOKEN')
+        sj_table_name = 'SuperJob Moscow'
 
-    vacancy_count_per_page = 10
+        vacancy_count_per_page = 10
 
-    programming_languages = [
-        'JavaScript', 'Python', 'Java', 'C#', 'PHP', 'C++',
-        'C', 'Ruby', 'Go'
-    ]
+        programming_languages = [
+            'JavaScript', 'Python', 'Java', 'C#', 'PHP', 'C++',
+            'C', 'Ruby', 'Go'
+        ]
 
-    hh_statistics = get_hh_statistics(
-        languages=programming_languages,
-        header=header,
-        professional_role_id=96,
-        specialization_id=1,
-        period=30,
-        vacancy_count_per_page=vacancy_count_per_page,
-        area_id=1
-    )
-    sj_statistics = get_sj_statistics(
-        languages=programming_languages,
-        catalogues_id=48,
-        token=token,
-        vacancy_count_per_page=vacancy_count_per_page,
-        town_id=4,
-        period=7
-    )
+        hh_statistics = get_hh_statistics(
+            languages=programming_languages,
+            header=header,
+            professional_role_id=96,
+            specialization_id=1,
+            period=30,
+            vacancy_count_per_page=vacancy_count_per_page,
+            area_id=1
+        )
+        sj_statistics = get_sj_statistics(
+            languages=programming_languages,
+            catalogues_id=48,
+            token=token,
+            vacancy_count_per_page=vacancy_count_per_page,
+            town_id=4,
+            period=7
+        )
 
-    terminal_tables = (create_table(hh_table_name, hh_statistics),
-                       create_table(sj_table_name, sj_statistics))
-    print(*terminal_tables, sep='\n')
+        terminal_tables = (create_table(hh_table_name, hh_statistics),
+                           create_table(sj_table_name, sj_statistics))
+        print(*terminal_tables, sep='\n')
+    except requests.exceptions.HTTPError:
+        logger.error(
+            'Ошибка обработки HTTP запроса, попробуйте перезапустить скрипт'
+        )
+        sys.exit(1)
+    except Exception:
+        logger.error('Непредвиденная ошибка')
 
 
 if __name__ == '__main__':
