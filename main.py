@@ -139,13 +139,16 @@ def get_hh_statistics(
                 if approximate_rub_salary:
                     vacancies_processed += 1
                     salaries_sum += approximate_rub_salary
-        average_rub_salary = salaries_sum / vacancies_processed
+        if vacancies_processed:
+            average_rub_salary = salaries_sum / vacancies_processed
+        else:
+            average_rub_salary = 0
         language_statistics.append(
             [
                 language,
                 vacancy_count,
                 vacancies_processed,
-                int(average_rub_salary if vacancies_processed else 0)
+                int(average_rub_salary)
             ]
         )
     return language_statistics
@@ -178,13 +181,16 @@ def get_sj_statistics(
                 if approximate_rub_salary:
                     vacancies_processed += 1
                     salaries_sum += approximate_rub_salary
-        average_rub_salary = salaries_sum / vacancies_processed
+        if vacancies_processed:
+            average_rub_salary = salaries_sum / vacancies_processed
+        else:
+            average_rub_salary = 0
         language_statistics.append(
             [
                 language,
                 vacancy_count,
                 vacancies_processed,
-                int(average_rub_salary if vacancies_processed else 0)
+                int(average_rub_salary)
             ]
         )
     return language_statistics
