@@ -28,13 +28,13 @@ def fetch_hh_vacancies(
     with requests.Session() as s:
         s.headers.update({'User-Agent': header})
         s.params = {
-                        'period': period,
-                        'specialization': specialization_id,
-                        'area': area_id,
-                        'professional_role': professional_role_id,
-                        'per_page': vacancy_count_per_page,
-                        'text': language,
-                    }
+            'period': period,
+            'specialization': specialization_id,
+            'area': area_id,
+            'professional_role': professional_role_id,
+            'per_page': vacancy_count_per_page,
+            'text': language,
+        }
         for page in count():
             page_response = s.get(
                 url='https://api.hh.ru/vacancies',
@@ -61,12 +61,12 @@ def fetch_sj_vacancies(
     with requests.Session() as s:
         s.headers.update({'X-Api-App-Id': token})
         s.params = {
-                        'town': town_id,
-                        'catalogues': catalogues_id,
-                        'count': vacancy_count_per_page,
-                        'period': period,
-                        'keyword': language,
-                    }
+            'town': town_id,
+            'catalogues': catalogues_id,
+            'count': vacancy_count_per_page,
+            'period': period,
+            'keyword': language,
+        }
         for page in count():
             page_response = s.get(
                 url='https://api.superjob.ru/2.0/vacancies',
