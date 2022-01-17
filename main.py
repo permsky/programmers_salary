@@ -9,13 +9,6 @@ from loguru import logger
 from terminaltables import AsciiTable
 
 
-logger.add(
-    sys.stderr,
-    format='[{time:HH:mm:ss}] <lvl>{message}</lvl>',
-    level='ERROR'
-)
-
-
 def fetch_hh_vacancies(
         header: str,
         professional_role_id: int,
@@ -214,6 +207,11 @@ def create_table(table_name: str, table_content: list) -> str:
 @logger.catch
 def main() -> None:
     """Print average salary tables for hh.ru and superjob.ru."""
+    logger.add(
+        sys.stderr,
+        format='[{time:HH:mm:ss}] <lvl>{message}</lvl>',
+        level='ERROR'
+    )
     load_dotenv()
     header = os.getenv('HH_HEADER')
     hh_table_name = 'HeadHunter Moscow'
